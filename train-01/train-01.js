@@ -1,12 +1,8 @@
 $(document).ready(function (){
 
-    const thead = $('thead')
     const tbody = $('tbody')
-    const tfooter = $('tfooter')
 
     locEnCours = () => {
-
-
         $.ajax({
             url: '../rqTsLocEnCours.php',
             type: 'GET',
@@ -15,7 +11,6 @@ $(document).ready(function (){
         }).done(result => {
             let idRow = '';
             let dataRow;
-
             for (row of result){
                 tbody.append(
                     $('<tr>', {
@@ -49,20 +44,25 @@ $(document).ready(function (){
     const inputDate = $('<label>Date de fin</label><input type="date" required>')
     const inputCalcDate = $('<label>Jours</label><input type="text" disabled><br>')
     const inputKm = $('<label>Kms</label><input type="text" disabled>')
-    const inputKmFin = $('<label>Kms actuel</label><input type="text" required>')
-    const inputCalcKm = $('<label>Kms parcouru</label><input type="text" disabled><br>')
-    const inputPrix = $('<label>Prix : </label><input type="text"><label> €</label><br>')
+    const inputKmFin = $('<label>Kms parcouru</label><input type="text" required>')
+    const inputCalcKm = $('<label>Kms actuel</label><input type="text" disabled><br>')
+    const inputPrix = $('<label>Prix : </label><input type="text" disabled><label> €</label><br>')
     const inputRemise = $('<label>Remise : </label><input type="text"><br>')
     const btnPayer = $('<button type="submit">Payer</button>')
     const btnAnnuler = $('<button type="submit">Annuler</button>')
 
+    const toutLesTr = $('tr')
 
-
-    $('tr').on('click', function(){
+    toutLesTr.on('click', function(){
 
         const idLocFocus = $(this)[0].cells[0].innerHTML
-        $(this).after('<tr style="height: 100px"><td></td>'+ infoTable +'</tr>');      
+        $(this).after('<tr class="removeTable" style="height: 100px"><td></td>'+ infoTable +'</tr>');      
         trFocus = $('tr').filter('#' + idLocFocus)
+
+        // trVisible = $('.removeTable')
+        // trVisible.on('click', function(){
+        //     trVisible.remove()
+        // })
 
     
         // Ajout des éléments dans la ligne INFO //
@@ -119,27 +119,55 @@ $(document).ready(function (){
         }
         $(inputKmFin).on('input', calculPrix)
 
-        const prixBase = $(inputPrix).val()
         // On va calculer la remise
         calculRemise = () => {
             const remise = inputRemise[1].value
             if (inputRemise[1].value !== ""){
-                $(inputPrix).val((prixBase - remise)) 
+                $(inputPrix).val(($(inputPrix).val() - remise)) 
             } else {
-                console.log(prixBase)
-                $(inputPrix).val(prixBase)
+                $(inputPrix).val()
             }
         }
         $(inputRemise).on('change', calculRemise)
             
         
+        payChecked = () => {
 
-       
-    
+            const idLoc = $(this)[0].id
+            const dFinLoc = inputDate[1].value
+            const kmFinLoc = inputCalcKm.val()
+            const prixLoc = inputPrix.val()
+            const remLoc = "Aucunes remarques"
+
+            const location = { 
+                        dFinLoc: dFinLoc,
+                        kmFinLoc: kmFinLoc, 
+                        prixLoc: prixLoc,
+                        remLoc: remLoc ,
+                        idLoc: idLoc
+                    };
+
+            $.ajax({
+                url: '../rqRetourUneLoc.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    location: JSON.stringify(location)
+                
+                },
+                async: true
+            }).done(function(){
+                console.log('good')
+            })
+
+        }
+
+        btnPayer.on('click', payChecked)
+
+
+
         // ----- CSS ----- //
         $('input').css('margin', '1em')
-
-
     })
 
 
