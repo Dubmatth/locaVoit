@@ -96,28 +96,42 @@ $(document).ready(function (){
 
 
         // CALCUL DES KMS PARCOURU ET TARIFICATION //
-        $(inputKmFin).on('input', (event) => {
-
+        calculPrix = (event) => {
             // Calcul des kms
-            let kmDebut = $(inputKm).val()
-            let kmFin = $(inputKmFin).val(event.target.value)
-            let kmParcouru = parseInt(kmDebut) + parseInt(kmFin.val())
+            const kmDebut = $(inputKm).val()
+            const kmFin = $(inputKmFin).val(event.target.value)
+            const kmParcouru = parseInt(kmDebut) + parseInt(kmFin.val())
             $(inputCalcKm.val(kmParcouru))
 
             // Prix pour les kms parcourus
-            let prixKm = $(this)[0].cells[11].innerHTML
-            let prixAPayerKm = parseInt(kmFin.val()) * parseFloat(prixKm)
+            const prixKm = $(this)[0].cells[11].innerHTML
+            const prixAPayerKm = parseInt(kmFin.val()) * parseFloat(prixKm)
 
             // Prix pour les jours d'utilisation
-            let nbJours = $(inputCalcDate).val()
-            let prixParJour = $(this)[0].cells[12].innerHTML
-            let prixAPayerJourUtiliser = nbJours * prixParJour
+            const nbJours = $(inputCalcDate).val()
+            const prixParJour = $(this)[0].cells[12].innerHTML
+            const prixAPayerJourUtiliser = nbJours * prixParJour
 
-            // Prix jours + prix kms 
-            $(inputPrix).val(parseFloat(prixAPayerKm) + parseFloat(prixAPayerJourUtiliser))                
+            const prixDefinitif = parseFloat(prixAPayerKm) + parseFloat(prixAPayerJourUtiliser)
+                
+            $(inputPrix).val(prixDefinitif)  
 
-        })
+        }
+        $(inputKmFin).on('input', calculPrix)
 
+        const prixBase = $(inputPrix).val()
+        // On va calculer la remise
+        calculRemise = () => {
+            const remise = inputRemise[1].value
+            if (inputRemise[1].value !== ""){
+                $(inputPrix).val((prixBase - remise)) 
+            } else {
+                console.log(prixBase)
+                $(inputPrix).val(prixBase)
+            }
+        }
+        $(inputRemise).on('change', calculRemise)
+            
         
 
        
