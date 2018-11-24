@@ -1,6 +1,6 @@
 <?php
   $pdo=new PDO('mysql:host=localhost; dbname=locavoit2016; charset=utf8',
-               'root', '');
+               'root', 'root');
 
   $statement=$pdo->prepare("
     SELECT idLoc, dDebLoc, DATEDIFF(CURDATE(),dDebLoc)+1 AS dureeLoc, kmDebLoc,

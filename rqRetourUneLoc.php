@@ -2,7 +2,7 @@
   $location= json_decode($_POST['location']);
 
   $pdo=new PDO('mysql:host=localhost; dbname=locavoit2016; charset=utf8',
-               'root', '');
+               'root', 'root');
 
   $statement=$pdo->prepare("
     UPDATE locations
