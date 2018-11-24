@@ -4,7 +4,6 @@ $(document).ready(function (){
     const tbody = $('tbody')
     const tfooter = $('tfooter')
 
-
     locEnCours = () => {
 
 
@@ -46,22 +45,92 @@ $(document).ready(function (){
     locEnCours();
 
     const infoTable = '<td class="infoTable" colspan="13"></td>'
+    const inputDuree = $('<label>Durée</label><input type="text" disabled>')
+    const inputDate = $('<label>Date de fin</label><input type="date" required>')
+    const inputCalcDate = $('<label>Jours</label><input type="text" disabled><br>')
+    const inputKm = $('<label>Kms</label><input type="text" disabled>')
+    const inputKmFin = $('<label>Kms actuel</label><input type="text" required>')
+    const inputCalcKm = $('<label>Kms parcouru</label><input type="text" disabled><br>')
+    const inputPrix = $('<label>Prix : </label><input type="text"><label> €</label><br>')
+    const inputRemise = $('<label>Remise : </label><input type="text"><br>')
+    const btnPayer = $('<button type="submit">Payer</button>')
+    const btnAnnuler = $('<button type="submit">Annuler</button>')
 
-    const dsIp = $('<input type="text" value="Salut" disabled>')
 
 
     $('tr').on('click', function(){
+
         const idLocFocus = $(this)[0].cells[0].innerHTML
-        $(this).after('<tr style="height: 100px"><td></td>'+ infoTable +'</tr>');
-        // console.log($(this).after().attr('hidden'))
-        $('.infoTable').append(
-            $(dsIp).val()
-        )
+        $(this).after('<tr style="height: 100px"><td></td>'+ infoTable +'</tr>');      
+        trFocus = $('tr').filter('#' + idLocFocus)
+
     
-           
+        // Ajout des éléments dans la ligne INFO //
+        $('.infoTable').append(
+            $(inputDuree).val(trFocus[0].children[2].innerHTML),
+            // FIXME Probleme avec le input dans la date si on modifie au click fléché
+            $(inputDate).attr('min', '2018-11-24'),
+            $(inputCalcDate),
+            $(inputKm).val(trFocus[0].children[4].innerHTML),
+            $(inputKmFin),
+            $(inputCalcKm),
+            $(inputPrix),
+            $(inputRemise),
+            $(btnPayer),
+            $(btnAnnuler)
+        )
+
+        // CALCUL DES Jours de location //
+        $(inputDate).on('change', () => {
+            let date1 = new Date(inputDuree.val())
+            let date2 = new Date(inputDate[1].value)
+
+            let resultDate;
+            diffdate = (d1,d2) => {
+                var WNbJours = d2.getTime() - d1.getTime();
+                return Math.ceil(WNbJours/(1000*60*60*24));
+            }
+            resultDate = diffdate(date1,date2)
+            $(inputCalcDate).val(resultDate)
+        })
+
+
+        // CALCUL DES KMS PARCOURU ET TARIFICATION //
+        $(inputKmFin).on('input', (event) => {
+
+            // Calcul des kms
+            let kmDebut = $(inputKm).val()
+            let kmFin = $(inputKmFin).val(event.target.value)
+            let kmParcouru = parseInt(kmDebut) + parseInt(kmFin.val())
+            $(inputCalcKm.val(kmParcouru))
+
+            // Prix pour les kms parcourus
+            let prixKm = $(this)[0].cells[11].innerHTML
+            let prixAPayerKm = parseInt(kmFin.val()) * parseFloat(prixKm)
+
+            // Prix pour les jours d'utilisation
+            let nbJours = $(inputCalcDate).val()
+            let prixParJour = $(this)[0].cells[12].innerHTML
+            let prixAPayerJourUtiliser = nbJours * prixParJour
+
+            // Prix jours + prix kms 
+            $(inputPrix).val(parseFloat(prixAPayerKm) + parseFloat(prixAPayerJourUtiliser))                
+
+        })
+
+        
+
        
+    
+        // ----- CSS ----- //
+        $('input').css('margin', '1em')
+
 
     })
+
+
+    
+
 
     
 })
